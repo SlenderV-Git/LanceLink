@@ -28,4 +28,4 @@ COPY . .
 EXPOSE 8000
 
 # Запуск FastAPI приложения
-CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/root/.local/bin/poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
