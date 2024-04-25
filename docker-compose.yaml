@@ -9,7 +9,7 @@ services:
         depends_on:
           - api
     api:
-      build: airflow-token-api
+      build: backend
       expose:
         - 8000
       ports:

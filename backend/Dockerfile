@@ -1,11 +1,31 @@
-FROM python:3.9.5-slim-buster
+# Базовый образ с Python 3.11.5
+FROM python:3.11.5-slim
 
-ARG app_root=/app
+# Установка зависимостей системы
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Установка Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Создание и установка рабочей директории
 WORKDIR /app
 
-COPY ./poetry.lock ./pyproject.toml ${app_root}/
-COPY ./hello-nginx-app ${app_root}/
+# Копирование файлов проекта
+COPY pyproject.toml poetry.lock ./
 
-RUN pip install poetry==1.1.3
-RUN poetry install && poetry cache clear --all -n pypi
-CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0"]
+# Установка зависимостей проекта
+RUN /root/.local/bin/poetry config virtualenvs.create false \
+    && /root/.local/bin/poetry install --no-interaction --no-ansi
+
+# Копирование остальных файлов проекта
+COPY . .
+
+# Открытие порта для приложения
+EXPOSE 8000
+
+# Запуск FastAPI приложения
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
